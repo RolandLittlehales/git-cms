@@ -1,0 +1,25 @@
+{
+  "name": "Brand Beta",
+  "slug": "brand-b",
+  "description": "A creative design agency",
+  "theme": {
+    "colors": {
+      "primary": "#DC2626",
+      "secondary": "#7C3AED",
+      "accent": "#EC4899",
+      "background": "#FFF1F2",
+      "foreground": "#4C0519",
+      "muted": "#FFE4E6",
+      "mutedForeground": "#BE123C"
+    },
+    "darkMode": {
+      "primary": "#F87171",
+      "secondary": "#A78BFA",
+      "accent": "#F472B6",
+      "background": "#18181B",
+      "foreground": "#FAFAFA",
+      "muted": "#27272A",
+      "mutedForeground": "#A1A1AA"
+    }
+  }
+}

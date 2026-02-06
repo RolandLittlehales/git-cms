@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm nx show:*)",
+      "Bash(pnpm add:*)",
+      "Bash(where.exe:*)",
+      "Bash(Get-Command claude)",
+      "Bash(cmd.exe /c \"where claude\")",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(npx nx dev web)",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(corepack --version:*)",
+      "Bash(pnpm nx build:*)",
+      "Bash(pnpm nx sync:*)",
+      "WebSearch",
+      "WebFetch(domain:tina.io)",
+      "Bash(git init:*)",
+      "Bash(git -C C:\\\\Users\\\\rolan\\\\Code\\\\git-cms remote add:*)",
+      "Bash(git -C C:UsersrolanCodegit-cms remote -v)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "nx-mcp"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./libs/cms-components"
+    },
+    {
+      "path": "./libs/tenant-config"
+    },
+    {
+      "path": "./libs/content-api"
+    },
+    {
+      "path": "./libs/theme"
+    }
+  ]
+}

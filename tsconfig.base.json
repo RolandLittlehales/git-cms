@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "lib": ["es2022"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2022",
+    "customConditions": ["@git-cms/source"],
+    "paths": {
+      "@git-cms/content-api": ["libs/content-api/src/index.ts"],
+      "@git-cms/cms-components": ["libs/cms-components/src/index.ts"],
+      "@git-cms/theme": ["libs/theme/src/index.ts"],
+      "@git-cms/tenant-config": ["libs/tenant-config/src/index.ts"]
+    }
+  }
+}

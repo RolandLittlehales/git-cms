@@ -23,7 +23,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npx next build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(findstr:*)",
+      "Bash(Select-String \"w/crlf\")",
+      "Bash(file:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

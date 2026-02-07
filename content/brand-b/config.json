@@ -2,6 +2,10 @@
   "name": "Brand Beta",
   "slug": "brand-b",
   "description": "A creative design agency",
+  "navigation": [
+    { "label": "Home", "href": "/brand-b" },
+    { "label": "Services", "href": "/brand-b/services" }
+  ],
   "theme": {
     "colors": {
       "primary": "#DC2626",

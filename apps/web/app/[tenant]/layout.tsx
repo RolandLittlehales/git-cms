@@ -19,10 +19,18 @@ export default async function TenantLayout({
     notFound();
   }
 
+  const navigationItems = tenantConfig.navigation ?? [
+    { label: 'Home', href: `/${tenant}` },
+  ];
+
   return (
     <ThemeProvider theme={tenantConfig.theme}>
       <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)]">
-        <TenantHeader tenantName={tenantConfig.name} tenantSlug={tenant} />
+        <TenantHeader
+          tenantName={tenantConfig.name}
+          tenantSlug={tenant}
+          navigationItems={navigationItems}
+        />
         <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
       </div>
     </ThemeProvider>

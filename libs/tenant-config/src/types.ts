@@ -14,10 +14,16 @@ export interface TenantTheme {
   fontFamily?: string;
 }
 
+export interface NavigationItem {
+  label: string;
+  href: string;
+}
+
 export interface TenantConfig {
   name: string;
   slug: string;
   theme: TenantTheme;
+  navigation?: NavigationItem[];
   logo?: string;
   description?: string;
 }

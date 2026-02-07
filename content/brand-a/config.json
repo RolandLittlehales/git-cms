@@ -2,6 +2,10 @@
   "name": "Brand Alpha",
   "slug": "brand-a",
   "description": "A modern technology brand",
+  "navigation": [
+    { "label": "Home", "href": "/brand-a" },
+    { "label": "About", "href": "/brand-a/about" }
+  ],
   "theme": {
     "colors": {
       "primary": "#4F46E5",

@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { clsx } from 'clsx';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+  'inline-flex items-center justify-center rounded-md font-medium no-underline transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
   {
     variants: {
       intent: {
@@ -26,15 +26,35 @@ const buttonVariants = cva(
   }
 );
 
+const isAbsoluteUrl = (url: string): boolean =>
+  url.startsWith('http://') || url.startsWith('https://');
+
 type ButtonProps = VariantProps<typeof buttonVariants> & {
-  children: React.ReactNode;
+  label: string;
+  url: string;
   className?: string;
 };
 
-export function Button({ intent, size, children, className }: ButtonProps) {
+export function Button({ intent, size, label, url = '#', className }: ButtonProps) {
+  const classes = clsx(buttonVariants({ intent, size }), className);
+
+  if (isAbsoluteUrl(url)) {
+    return (
+      <a
+        href={url}
+        className={classes}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${label} (opens in a new tab)`}
+      >
+        {label}
+      </a>
+    );
+  }
+
   return (
-    <button className={clsx(buttonVariants({ intent, size }), className)}>
-      {children}
-    </button>
+    <a href={url} className={classes}>
+      {label}
+    </a>
   );
 }

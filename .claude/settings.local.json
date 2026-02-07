@@ -19,7 +19,9 @@
       "WebFetch(domain:tina.io)",
       "Bash(git init:*)",
       "Bash(git -C C:\\\\Users\\\\rolan\\\\Code\\\\git-cms remote add:*)",
-      "Bash(git -C C:UsersrolanCodegit-cms remote -v)"
+      "Bash(git -C C:UsersrolanCodegit-cms remote -v)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

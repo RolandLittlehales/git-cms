@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useLayoutEffect } from 'react';
 import type { TenantTheme } from '@git-cms/tenant-config';
 import { themeColorsToCssVars } from './tokens';
 
@@ -23,15 +23,26 @@ interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
+function syncDocumentColorMode(mode: ColorMode): void {
+  document.documentElement.setAttribute('data-color-mode', mode);
+  document.documentElement.classList.toggle('dark', mode === 'dark');
+}
+
 export function ThemeProvider({ theme, children }: ThemeProviderProps) {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setColorMode(mediaQuery.matches ? 'dark' : 'light');
+    const initialMode = mediaQuery.matches ? 'dark' : 'light';
+    setColorMode(initialMode);
+    syncDocumentColorMode(initialMode);
+    setHydrated(true);
 
     const handleChange = (event: MediaQueryListEvent) => {
-      setColorMode(event.matches ? 'dark' : 'light');
+      const newMode = event.matches ? 'dark' : 'light';
+      setColorMode(newMode);
+      syncDocumentColorMode(newMode);
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -40,7 +51,11 @@ export function ThemeProvider({ theme, children }: ThemeProviderProps) {
 
   const activeColors =
     colorMode === 'dark' ? theme.darkMode : theme.colors;
-  const cssVariables = themeColorsToCssVars(activeColors);
+
+  // Defer inline styles until after hydration so the CSS media query dark
+  // fallback in global.css isn't overridden by server-rendered light values.
+  // useLayoutEffect applies tenant-specific colors before the browser paints.
+  const cssVariables = hydrated ? themeColorsToCssVars(activeColors) : {};
 
   return (
     <ThemeContext value={{ colorMode }}>

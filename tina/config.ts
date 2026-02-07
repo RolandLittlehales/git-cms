@@ -19,9 +19,16 @@ const buttonTemplate: Template = {
       options: ['sm', 'md', 'lg'],
     },
     {
-      name: 'children',
+      name: 'label',
       label: 'Button Text',
       type: 'string',
+      required: true,
+    },
+    {
+      name: 'url',
+      label: 'URL',
+      type: 'string',
+      required: true,
     },
   ],
 };

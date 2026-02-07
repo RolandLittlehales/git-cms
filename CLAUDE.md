@@ -87,6 +87,12 @@
 - Use `use()` (React 19) for reading promises and context in render
 - Prefer derived state over `useState` + `useEffect` sync — if a value can be computed from props/other state, compute it inline
 
+### Hydration
+
+- Use `useLayoutEffect` (not `useEffect`) for DOM changes that must apply before the browser paints — e.g., color mode, theme variables, scroll position
+- Never initialize `useState` with a value that differs between server and client (e.g., reading `window` or `document`) — this creates a hydration mismatch that `suppressHydrationWarning` hides but doesn't fix
+- For client state that depends on browser APIs, initialize with the server-safe default and correct it in `useLayoutEffect`
+
 ### Composition
 
 - Prefer **composition over configuration** — pass children/render props instead of giant config objects
@@ -140,6 +146,13 @@
 - Prefer utility classes over custom CSS
 - Extract repeated patterns into components, not into CSS abstractions
 - Use the `@tailwindcss/typography` plugin for prose/MDX content styling
+
+### Inline Styles
+
+- **Never use inline `style` props to set visual properties** that CSS variables or Tailwind utility classes can handle — inline styles bypass the cascade, break dark mode fallbacks, and cause hydration mismatches in client components
+- For dynamic per-element values (e.g., a color from data), set a **scoped CSS variable** via `style` and reference it with a Tailwind arbitrary value: `style={{ '--x': value }}` + `className="bg-[var(--x)]"`
+- In client components that hydrate, **never render inline styles on the server that differ from client initial state** — this causes flash-of-wrong-content even with `suppressHydrationWarning`
+- If a client component must defer styles until after hydration, gate them behind a `hydrated` state flag set in `useLayoutEffect`
 
 ---
 

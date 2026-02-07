@@ -30,8 +30,8 @@ export default function HomePage() {
               <p className="text-gray-600">{config.description}</p>
             )}
             <span
-              className="mt-3 inline-block rounded-full px-3 py-1 text-xs font-medium text-white"
-              style={{ backgroundColor: config.theme.colors.primary }}
+              className="mt-3 inline-block rounded-full bg-[var(--badge-color)] px-3 py-1 text-xs font-medium text-white"
+              style={{ '--badge-color': config.theme.colors.primary } as React.CSSProperties}
             >
               /{id}
             </span>

@@ -3,8 +3,20 @@
   "slug": "brand-a",
   "description": "A modern technology brand",
   "navigation": [
-    { "label": "Home", "href": "/brand-a" },
-    { "label": "About", "href": "/brand-a/about" }
+    {
+      "label": "Home",
+      "href": "/brand-a"
+    },
+    {
+      "label": "About",
+      "href": "/brand-a/about"
+    }
+  ],
+  "allowedComponents": [
+    "Button",
+    "Callout",
+    "MediaCard",
+    "Table"
   ],
   "theme": {
     "colors": {

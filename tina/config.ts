@@ -1,4 +1,6 @@
-import { defineConfig, type Collection, type Template } from 'tinacms';
+import { defineConfig, type Template, type TinaField } from 'tinacms';
+import brandAConfig from '../content/brand-a/config.json';
+import brandBConfig from '../content/brand-b/config.json';
 
 // -- Component templates for the rich-text editor --
 
@@ -87,16 +89,63 @@ const tableTemplate: Template = {
   ],
 };
 
-const componentTemplates: Template[] = [
+// -- Template registry derived from a single source array --
+
+const allTemplates: Template[] = [
   buttonTemplate,
   calloutTemplate,
   mediaCardTemplate,
   tableTemplate,
 ];
 
+const templatesByName: Record<string, Template> = Object.fromEntries(
+  allTemplates.map((template) => [template.name, template]),
+);
+
+type ComponentName = keyof typeof templatesByName;
+
+// -- Per-tenant configuration --
+
+const tenants = [
+  {
+    id: 'brand-a',
+    collectionName: 'brandA',
+    label: 'Brand A',
+    config: brandAConfig,
+  },
+  {
+    id: 'brand-b',
+    collectionName: 'brandB',
+    label: 'Brand B',
+    config: brandBConfig,
+  },
+] as const;
+
+function getTemplatesForTenant(tenantId: string): Template[] {
+  const tenant = tenants.find((t) => t.id === tenantId);
+  const allowedComponents: readonly string[] | undefined =
+    tenant?.config.allowedComponents;
+
+  if (!allowedComponents) {
+    return [];
+  }
+
+  return allowedComponents
+    .filter((name) => {
+      if (!(name in templatesByName)) {
+        console.warn(
+          `[tina] Unknown component "${name}" in allowedComponents for tenant "${tenantId}" — skipping`,
+        );
+        return false;
+      }
+      return true;
+    })
+    .map((name) => templatesByName[name as ComponentName]);
+}
+
 // -- Shared page fields used by every tenant collection --
 
-const pageFields: Collection['fields'] = [
+const basePageFields: TinaField[] = [
   {
     name: 'title',
     label: 'Title',
@@ -138,30 +187,39 @@ const pageFields: Collection['fields'] = [
       component: 'textarea',
     },
   },
-  {
-    name: 'body',
-    label: 'Body',
-    type: 'rich-text',
-    isBody: true,
-    templates: componentTemplates,
-  },
 ];
+
+function buildPageFields(templates: Template[]): TinaField[] {
+  return [
+    ...basePageFields,
+    {
+      name: 'body',
+      label: 'Body',
+      type: 'rich-text',
+      isBody: true,
+      templates: templates.length > 0 ? templates : undefined,
+    },
+  ];
+}
 
 // -- Collection factory to avoid duplication across tenants --
 
 function createTenantPageCollection(
   tenantId: string,
   collectionName: string,
-  label: string
-): Collection {
+  label: string,
+) {
+  const templates = getTemplatesForTenant(tenantId);
+
   return {
     name: `${collectionName}_pages`,
     label: `${label} Pages`,
     path: `content/${tenantId}/pages`,
-    format: 'mdx',
-    fields: pageFields,
+    format: 'mdx' as const,
+    fields: buildPageFields(templates),
     ui: {
-      router: ({ document }) => `/${tenantId}/${document._sys.filename}`,
+      router: ({ document }: { document: { _sys: { filename: string } } }) =>
+        `/${tenantId}/${document._sys.filename}`,
     },
   };
 }
@@ -181,9 +239,12 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [
-      createTenantPageCollection('brand-a', 'brandA', 'Brand A'),
-      createTenantPageCollection('brand-b', 'brandB', 'Brand B'),
-    ],
+    collections: tenants.map((tenant) =>
+      createTenantPageCollection(
+        tenant.id,
+        tenant.collectionName,
+        tenant.label,
+      ),
+    ),
   },
 });

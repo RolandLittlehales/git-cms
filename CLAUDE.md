@@ -120,9 +120,30 @@
 ### Local Mode (POC)
 
 - Tina local mode reads/writes directly to the filesystem — no GitHub API needed
-- `tina dev` runs alongside `next dev`
+- `tina dev` runs alongside `next dev` (via `pnpm dev` at repo root)
 - Content changes are written directly to `/content` as file modifications
 - No authentication required in local mode
+
+### Editing Content in Admin
+
+- The admin UI is served at `http://localhost:3000/admin/index.html` (port 3000, not 4001)
+- Port 4001 is the Tina GraphQL API server — not the editor UI
+- To edit a page: open admin → click a collection (e.g. "Brand A Pages") → find the document → click the **three-dot menu** → **"Edit in Admin"**
+- This project does **not** have Tina visual/contextual editing (`useTina` hook) — editing is form-based only via the admin panel
+- The `ui.router` in `tina/config.ts` defines URL mapping but visual editing requires additional client-side integration that is not implemented
+
+### Tina Config Bundling
+
+- Tina bundles `tina/config.ts` with **Vite** for the browser — Node.js modules (`fs`, `path`, `url`) are **not available**
+- To read tenant config data in `tina/config.ts`, use static JSON imports (`import config from '../content/brand-a/config.json'`) instead of `fs.readFileSync`
+- The bundled output is visible at `tina/__generated__/config.prebuild.jsx` for debugging
+
+### Per-Brand Component Configuration
+
+- Each tenant's `config.json` has an optional `allowedComponents` array controlling which MDX components appear in the Tina editor
+- **Opt-in model**: if `allowedComponents` is omitted, no custom components are available in the editor
+- The allowlist only affects the Tina editor — the frontend renderer always uses the full component registry, so existing MDX content renders regardless
+- Component names must match the template `name` in `tina/config.ts` (e.g. `"Button"`, `"Callout"`, `"MediaCard"`, `"Table"`)
 
 ### Content Modeling
 

@@ -6,6 +6,7 @@
     { "label": "Home", "href": "/brand-b" },
     { "label": "Services", "href": "/brand-b/services" }
   ],
+  "allowedComponents": ["Button", "Callout", "MediaCard", "Table"],
   "theme": {
     "colors": {
       "primary": "#DC2626",

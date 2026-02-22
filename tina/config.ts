@@ -1,11 +1,6 @@
-import { defineConfig, type Collection, type Template } from 'tinacms';
+import { defineConfig, type Template, type TinaField } from 'tinacms';
 import brandAConfig from '../content/brand-a/config.json';
 import brandBConfig from '../content/brand-b/config.json';
-
-const tenantConfigs: Record<string, { allowedComponents?: string[] }> = {
-  'brand-a': brandAConfig,
-  'brand-b': brandBConfig,
-};
 
 // -- Component templates for the rich-text editor --
 
@@ -94,31 +89,63 @@ const tableTemplate: Template = {
   ],
 };
 
-// -- Map template names to template objects for per-tenant filtering --
+// -- Template registry derived from a single source array --
 
-const templatesByName: Record<string, Template> = {
-  Button: buttonTemplate,
-  Callout: calloutTemplate,
-  MediaCard: mediaCardTemplate,
-  Table: tableTemplate,
-};
+const allTemplates: Template[] = [
+  buttonTemplate,
+  calloutTemplate,
+  mediaCardTemplate,
+  tableTemplate,
+];
+
+const templatesByName: Record<string, Template> = Object.fromEntries(
+  allTemplates.map((template) => [template.name, template]),
+);
+
+type ComponentName = keyof typeof templatesByName;
+
+// -- Per-tenant configuration --
+
+const tenants = [
+  {
+    id: 'brand-a',
+    collectionName: 'brandA',
+    label: 'Brand A',
+    config: brandAConfig,
+  },
+  {
+    id: 'brand-b',
+    collectionName: 'brandB',
+    label: 'Brand B',
+    config: brandBConfig,
+  },
+] as const;
 
 function getTemplatesForTenant(tenantId: string): Template[] {
-  const config = tenantConfigs[tenantId];
-  const allowedComponents = config?.allowedComponents;
+  const tenant = tenants.find((t) => t.id === tenantId);
+  const allowedComponents: readonly string[] | undefined =
+    tenant?.config.allowedComponents;
 
   if (!allowedComponents) {
     return [];
   }
 
   return allowedComponents
-    .filter((name) => name in templatesByName)
-    .map((name) => templatesByName[name]);
+    .filter((name) => {
+      if (!(name in templatesByName)) {
+        console.warn(
+          `[tina] Unknown component "${name}" in allowedComponents for tenant "${tenantId}" — skipping`,
+        );
+        return false;
+      }
+      return true;
+    })
+    .map((name) => templatesByName[name as ComponentName]);
 }
 
 // -- Shared page fields used by every tenant collection --
 
-const basePageFields: Collection['fields'] = [
+const basePageFields: TinaField[] = [
   {
     name: 'title',
     label: 'Title',
@@ -162,7 +189,7 @@ const basePageFields: Collection['fields'] = [
   },
 ];
 
-function buildPageFields(templates: Template[]): Collection['fields'] {
+function buildPageFields(templates: Template[]): TinaField[] {
   return [
     ...basePageFields,
     {
@@ -180,18 +207,19 @@ function buildPageFields(templates: Template[]): Collection['fields'] {
 function createTenantPageCollection(
   tenantId: string,
   collectionName: string,
-  label: string
-): Collection {
+  label: string,
+) {
   const templates = getTemplatesForTenant(tenantId);
 
   return {
     name: `${collectionName}_pages`,
     label: `${label} Pages`,
     path: `content/${tenantId}/pages`,
-    format: 'mdx',
+    format: 'mdx' as const,
     fields: buildPageFields(templates),
     ui: {
-      router: ({ document }) => `/${tenantId}/${document._sys.filename}`,
+      router: ({ document }: { document: { _sys: { filename: string } } }) =>
+        `/${tenantId}/${document._sys.filename}`,
     },
   };
 }
@@ -211,9 +239,12 @@ export default defineConfig({
     },
   },
   schema: {
-    collections: [
-      createTenantPageCollection('brand-a', 'brandA', 'Brand A'),
-      createTenantPageCollection('brand-b', 'brandB', 'Brand B'),
-    ],
+    collections: tenants.map((tenant) =>
+      createTenantPageCollection(
+        tenant.id,
+        tenant.collectionName,
+        tenant.label,
+      ),
+    ),
   },
 });

@@ -47,6 +47,9 @@ out
 
 test-output
 
+# TypeScript build info
+*.tsbuildinfo
+
 # Tina CMS
 tina/__generated__
 apps/web/public/admin

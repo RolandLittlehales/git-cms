@@ -1,6 +1,7 @@
 export { getTenantConfig, getAllTenantIds } from './loader';
 export { findWorkspaceRoot } from './workspace';
 export type {
+  ComponentName,
   NavigationItem,
   TenantConfig,
   TenantTheme,

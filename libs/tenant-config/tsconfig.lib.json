@@ -7,5 +7,10 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"],
+  "references": [
+    {
+      "path": "../cms-components/tsconfig.lib.json"
+    }
+  ]
 }

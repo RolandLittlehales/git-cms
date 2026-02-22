@@ -26,4 +26,8 @@ export interface TenantConfig {
   navigation?: NavigationItem[];
   logo?: string;
   description?: string;
+  allowedComponents?: ComponentName[];
 }
+
+// Re-export so consumers can use ComponentName without a separate import
+export type { ComponentName } from '@git-cms/cms-components';

@@ -1,4 +1,11 @@
 import { defineConfig, type Collection, type Template } from 'tinacms';
+import brandAConfig from '../content/brand-a/config.json';
+import brandBConfig from '../content/brand-b/config.json';
+
+const tenantConfigs: Record<string, { allowedComponents?: string[] }> = {
+  'brand-a': brandAConfig,
+  'brand-b': brandBConfig,
+};
 
 // -- Component templates for the rich-text editor --
 
@@ -87,16 +94,31 @@ const tableTemplate: Template = {
   ],
 };
 
-const componentTemplates: Template[] = [
-  buttonTemplate,
-  calloutTemplate,
-  mediaCardTemplate,
-  tableTemplate,
-];
+// -- Map template names to template objects for per-tenant filtering --
+
+const templatesByName: Record<string, Template> = {
+  Button: buttonTemplate,
+  Callout: calloutTemplate,
+  MediaCard: mediaCardTemplate,
+  Table: tableTemplate,
+};
+
+function getTemplatesForTenant(tenantId: string): Template[] {
+  const config = tenantConfigs[tenantId];
+  const allowedComponents = config?.allowedComponents;
+
+  if (!allowedComponents) {
+    return [];
+  }
+
+  return allowedComponents
+    .filter((name) => name in templatesByName)
+    .map((name) => templatesByName[name]);
+}
 
 // -- Shared page fields used by every tenant collection --
 
-const pageFields: Collection['fields'] = [
+const basePageFields: Collection['fields'] = [
   {
     name: 'title',
     label: 'Title',
@@ -138,14 +160,20 @@ const pageFields: Collection['fields'] = [
       component: 'textarea',
     },
   },
-  {
-    name: 'body',
-    label: 'Body',
-    type: 'rich-text',
-    isBody: true,
-    templates: componentTemplates,
-  },
 ];
+
+function buildPageFields(templates: Template[]): Collection['fields'] {
+  return [
+    ...basePageFields,
+    {
+      name: 'body',
+      label: 'Body',
+      type: 'rich-text',
+      isBody: true,
+      templates: templates.length > 0 ? templates : undefined,
+    },
+  ];
+}
 
 // -- Collection factory to avoid duplication across tenants --
 
@@ -154,12 +182,14 @@ function createTenantPageCollection(
   collectionName: string,
   label: string
 ): Collection {
+  const templates = getTemplatesForTenant(tenantId);
+
   return {
     name: `${collectionName}_pages`,
     label: `${label} Pages`,
     path: `content/${tenantId}/pages`,
     format: 'mdx',
-    fields: pageFields,
+    fields: buildPageFields(templates),
     ui: {
       router: ({ document }) => `/${tenantId}/${document._sys.filename}`,
     },
